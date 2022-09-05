@@ -1,0 +1,114 @@
+<html>
+<head>
+
+<style>
+.apiheader {
+	font-size: large;
+	font-weight: bold;
+	float: left;
+	margin-right: 5px;
+}
+.apiresults {
+	background-color: #cccccc;
+	width: 800px;
+	height: 60px;
+	padding: 10 10 5 5;
+	font-size: small;
+	overflow: scroll;
+	border: 1px;
+}
+
+.methodinfo {
+	font-size: medium;
+}
+
+</style>
+
+<script>
+
+function doRequest(method,URL,bearer,populateElementId) {
+
+	fetch(URL, {
+        method: method,
+        mode: 'cors',
+        credentials: 'include',        
+        headers: {
+            'Authorization': 'Bearer ' + bearer
+        }
+    })
+    .then((response) => {
+                if (response.ok) {
+                	console.log(response.headers.get("Content-Type") + " from " + URL);
+                	return response.json();
+                } else if (response.status == 401) {
+                	throw("AUTH ERROR bad token 401 " + response.headers.get("WWW-Authenticate"));
+                } else if (response.status == 403) {
+                	throw("AUTH ERROR permissions 403 " + response.headers.get("WWW-Authenticate"));
+                } else {
+                	throw("ERROR " + response.status);
+                }
+    })
+    .then((jresp) => {
+                document.getElementById(populateElementId).innerHTML = JSON.stringify(jresp,null,"\t");
+    })
+    .catch((error) => {
+                console.error('Caught error: ', error);
+                document.getElementById(populateElementId).innerHTML = error;
+                alert(error);
+    });
+    
+} // doRequest
+
+
+function callREST(method,uri,populateElementId) {
+
+  var resource_server = document.getElementById('resource_server').value;
+  var token = document.getElementById('token').value;
+  
+  doRequest(method,resource_server + uri,token,populateElementId);
+
+} // callREST
+
+</script>  	
+
+
+</head>
+<body>
+
+    <h3>OAuth2 Access Token</h3>
+  	
+  	<table>
+  	<tr>
+  		<td>Scopes</td>
+  		<td>{{ id_token.get("scp") }}</td>
+  	</tr>
+  	<tr>
+  		<td>Issued At</td>
+  		<td>{{ issued_at }}</td>
+  	</tr>
+  	<tr>
+  		<td>Expires At</td>
+  		<td>{{ expires_at }}</td>
+  	</tr>
+  	</table>
+  	
+<form id="dataform">
+<p>JWT:<br/>
+<textarea id="token" rows="8" cols="110" style="font-size: small;">{{ access_token }}
+</textarea>
+</p>
+<p>Resource Server: <input id="resource_server" type="text" value="http://localhost:8081"/></p>
+</form>
+
+<p>&nbsp;</p>
+<span class="apiheader">GET /api</span>
+<input type="button" value="Invoke" onClick="callREST('GET','/api','GETapi')"/>
+<p class="methodinfo">
+Returns: Test of authenticated call<br/>
+Authorization: any logged in user</p>
+<div id="GETapi" class="apiresults">Press 'Invoke' to populate</div>
+
+
+</body>
+</html>
+

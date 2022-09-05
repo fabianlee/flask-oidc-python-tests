@@ -1,0 +1,14 @@
+{% if user_loggedin %}
+
+<h3>Hello, {{ oidc.user_getfield("upn") }}</h3>
+
+<p><a href="/protected">Go to protected page</a></p>
+<p><a href="/logout">Log out</a></p>
+
+{% else %}
+
+<h3>Welcome, anonymous</h3>
+
+<p><a href="/protected">Please Log in</a></p>
+
+{% endif %}

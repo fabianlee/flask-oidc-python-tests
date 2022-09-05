@@ -1,0 +1,10 @@
+*.pem
+*.crt
+*.log
+flask-oidc/
+share/
+lib/
+**/lib64
+bin/
+include/
+pyvenv.cfg
