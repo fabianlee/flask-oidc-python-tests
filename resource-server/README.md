@@ -16,6 +16,9 @@ python --version
 sudo apt-get update
 sudo apt-get install software-properties-common python3 python3-dev python3-pip python3-venv make curl git -y
 
+# get ADFS enabled fork of flask-oidc
+git clone https://github.com/fabianlee/flask-oidc.git
+
 # setup virtual env for pip modules
 python -m venv .
 source bin/activate
