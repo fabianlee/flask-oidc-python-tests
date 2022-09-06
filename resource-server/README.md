@@ -63,6 +63,17 @@ docker run \
 fabianlee/docker-flask-oidc-resource-server:1.0.0
 ```
 
+## Testing JWT access token from command line
+
+```
+export ADFS=win2k19-adfs1.fabian.lee
+export JWT=<the access token>
+
+# runs tests against /api and /api/managers using bearer token
+./test-jwt-auth.sh
+```
+
+
 
 ## Notes
 

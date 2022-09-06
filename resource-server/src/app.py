@@ -66,6 +66,22 @@ def hello_api():
     }
     return data
 
+@app.route('/api/managers', methods=['GET','POST'])
+@oidc.accept_token(require_token=True, scopes_required=['openid'], groups_required=['managers'])
+def hello_manager():
+    """OAuth 2.0 protected API endpoint accessible via AccessToken"""
+
+    print("=== BEGIN ACCESS TOKEN =======================")
+    print(g.oidc_token_info)
+    print("=== END ACCESS TOKEN =========================")
+
+    data = {
+      "hello": f"Welcome {g.oidc_token_info['email']}",
+      "my_scopes": f"s{g.oidc_token_info['scp']}",
+      "my_groups": f"s{g.oidc_token_info['group']}"
+    }
+    return data
+
 
 if __name__ == '__main__' or __name__ == "main":
 
