@@ -28,7 +28,7 @@ pip install -r requirements.txt
 export ADFS=win2k19-adfs1.fabian.lee
 
 # add custom CA from ADFS server to CA filestore
-# you must provide the 'myCA.pem' file
+# If custom ADFS CA, you must provide or you will get CERTIFICATE_VERIFY_FAILED
 export ADFS_CA_PEM=$(cat myCA.pem | sed 's/\n/ /')
 python src/add_ca.py3
 
@@ -47,7 +47,7 @@ docker --version
 export ADFS=win2k19-adfs1.fabian.lee
 
 # add custom CA from ADFS server to CA filestore
-# you must provide the 'myCA.pem' file
+# If custom ADFS CA, you must provide or you will get CERTIFICATE_VERIFY_FAILED
 export ADFS_CA_PEM=$(cat myCA.pem | sed 's/\n/ /')
 
 # clear out any older runs

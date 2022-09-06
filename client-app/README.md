@@ -33,7 +33,7 @@ export ADFS_CLIENT_SECRET=<the oauth2 client secret>
 export ADFS_SCOPE="openid allatclaims api_delete"
 
 # add custom CA from ADFS server to CA filestore
-# you must provide the 'myCA.pem' file
+# If custom ADFS CA, you must provide or you will get CERTIFICATE_VERIFY_FAILED
 export ADFS_CA_PEM=$(cat myCA.pem | sed 's/\n/ /')
 python src/add_ca.py3
 
@@ -57,7 +57,7 @@ export ADFS_CLIENT_SECRET=<the oauth2 client secret>
 export ADFS_SCOPE="openid allatclaims api_delete"
 
 # add custom CA from ADFS server to CA filestore
-# you must provide the 'myCA.pem' file
+# If custom ADFS CA, you must provide or you will get CERTIFICATE_VERIFY_FAILED
 export ADFS_CA_PEM=$(cat myCA.pem | sed 's/\n/ /')
 
 # clear out any older runs
