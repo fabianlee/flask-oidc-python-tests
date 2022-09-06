@@ -50,7 +50,7 @@ export ADFS_CA_PEM=$(cat myCA.pem | sed 's/\n/ /')
 # clear out any older runs
 docker rm docker-flask-oidc-resource-server
 
-# run docker image locally, listening on localhost:8080
+# run docker image locally, listening on localhost:8081
 docker run \
 --network host \
 -p 8081:8081 \
