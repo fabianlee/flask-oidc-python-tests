@@ -1,35 +1,79 @@
-# Summary
-Python flask web server running by default on port 8000 that is intended for testing containers, especially from Kubernetes
+# flask-oidc-python-tests/client-app
 
-Image is based on python:3.9-slim-buster and is ~130Mb
+Python Flask web app that serves as the "Client Application" entity in an OAuth2 Authorization Code flow.
 
-# Environment variables
+blog: 
 
-* PORT - listen port, defaults to 8000
-* APP_CONTEXT - base context path of app, defaults to '/'
+## Run using local Python
 
-# Environment variables populated from Downward API
-* MY_NODE_NAME - name of k8s node
-* MY_POD_NAME - name of k8s pod
-* MY_POD_IP - k8s pod IP
-* MY_POD_SERVICE_ACCOUNT - service account of k8s pod
+```
+# need 3.x
+python --version
 
-# Prerequisites
-* make utility (sudo apt-get install make)
+# setup virtual env for pip modules
+python -m venv .
+source bin/activate
+pip install -r requirements.txt
 
-# Makefile targets
-* docker-build (builds image)
-* docker-run-fg (runs container in foreground, ctrl-C to exit)
-* docker-run-bg (runs container in background)
-* k8s-apply (applies deployment to kubernetes cluster)
-* k8s-delete (removes deployment on kubernetes cluster)
+# your ADFS server
+export ADFS=win2k19-adfs1.fabian.lee
 
-# getting packages correct
-# https://github.com/puiterwijk/flask-oidc/issues/147
-ImportError: cannot import name 'JSONWebSignatureSerializer' from 'itsdangerous'
-Until locking itsdangerous=2.0.1
+# OAuth2 client, secret, scope
+export ADFS_CLIENT_ID=5bb09ad7-08a0-4d03-9a6d-3d00adbdf595
+export ADFS_CLIENT_SECRET=zf0d09_PIG7RHSJoxCrdavq4WLkDbNxGXlb0AcEa
+export ADFS_SCOPE="openid allatclaims api_delete"
 
-# avoid https verification error by adding cert to truststore
-cat win2k19-adfs1.fabian.lee.pem >> lib/python3.8/site-packages/certifi/cacert.pem
-
+# add custom CA from ADFS server to CA filestore
+# you must provide the 'myCA.pem' file
 export ADFS_CA_PEM=$(cat myCA.pem | sed 's/\n/ /')
+python src/add_ca.py3
+
+# start on port 8080
+python src/app.py
+```
+
+## Run using local Docker daemon
+
+Image is based on python:3.9-slim-buster and is ~191Mb
+
+```
+docker --version
+
+# your ADFS server
+export ADFS=win2k19-adfs1.fabian.lee
+
+# OAuth2 client, secret, scope
+export ADFS_CLIENT_ID=5bb09ad7-08a0-4d03-9a6d-3d00adbdf595
+export ADFS_CLIENT_SECRET=zf0d09_PIG7RHSJoxCrdavq4WLkDbNxGXlb0AcEa
+export ADFS_SCOPE="openid allatclaims api_delete"
+
+# add custom CA from ADFS server to CA filestore
+# you must provide the 'myCA.pem' file
+export ADFS_CA_PEM=$(cat myCA.pem | sed 's/\n/ /')
+
+# clear out any older runs
+docker rm docker-flask-oidc-client-app
+
+# run docker image locally, listening on localhost:8080
+docker run \
+--network host \
+-p 8080:8080 \
+--name docker-flask-oidc-client-app \
+-e ADFS_CLIENT_ID=$ADFS_CLIENT_ID \
+-e ADFS_CLIENT_SECRET=$ADFS_CLIENT_SECRET \
+-e ADFS=$ADFS \
+-e ADFS_SCOPE="$ADFS_SCOPE" \
+-e ADFS_CA_PEM="$ADFS_CA_PEM" \
+fabianlee/docker-flask-oidc-client-app:1.0.0
+```
+
+
+## Notes
+
+* Had to lock pip module itsdangerous=2.0.1
+https://github.com/puiterwijk/flask-oidc/issues/147
+ImportError: cannot import name 'JSONWebSignatureSerializer' from 'itsdangerous'
+
+* Manual addition to local CA trust store
+cat myCA.pem >> lib/python3.8/site-packages/certifi/cacert.pem
+
