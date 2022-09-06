@@ -2,7 +2,7 @@
 
 Python Flask web app that serves as the "Client Application" entity in an OAuth2 Authorization Code flow.
 
-It orchestrates authentication with the ADFS server, and receives a callback which provides the ID and Access Token that can then be used for authentication to a microservice.
+It orchestrates authentication with the ADFS server, and receives a callback with token which is exchanged for ID and Access Token.
 
 blog: 
 
