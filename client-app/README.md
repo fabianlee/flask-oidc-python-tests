@@ -19,8 +19,8 @@ pip install -r requirements.txt
 export ADFS=win2k19-adfs1.fabian.lee
 
 # OAuth2 client, secret, scope
-export ADFS_CLIENT_ID=5bb09ad7-08a0-4d03-9a6d-3d00adbdf595
-export ADFS_CLIENT_SECRET=zf0d09_PIG7RHSJoxCrdavq4WLkDbNxGXlb0AcEa
+export ADFS_CLIENT_ID=<the oauth2 client id>
+export ADFS_CLIENT_SECRET=<the oauth2 client secret>
 export ADFS_SCOPE="openid allatclaims api_delete"
 
 # add custom CA from ADFS server to CA filestore
@@ -43,8 +43,8 @@ docker --version
 export ADFS=win2k19-adfs1.fabian.lee
 
 # OAuth2 client, secret, scope
-export ADFS_CLIENT_ID=5bb09ad7-08a0-4d03-9a6d-3d00adbdf595
-export ADFS_CLIENT_SECRET=zf0d09_PIG7RHSJoxCrdavq4WLkDbNxGXlb0AcEa
+export ADFS_CLIENT_ID=<the oauth2 client id>
+export ADFS_CLIENT_SECRET=<the oauth2 client secret>
 export ADFS_SCOPE="openid allatclaims api_delete"
 
 # add custom CA from ADFS server to CA filestore
