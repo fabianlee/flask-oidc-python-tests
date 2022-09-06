@@ -2,7 +2,7 @@
 
 blog:
 
-Python implementation of OAuth2 entities:
+Python Flask implementation of OAuth2 entities using [ADFS enabled fork of flask-oidc](https://github.com/fabianlee/flask-oidc):
 
 * [Client Application, web app running on port 8080](client-app/README.md)
 * [Resource Server, microservice running on port 8081](resource-server/README.md)
