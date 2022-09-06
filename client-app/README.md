@@ -70,10 +70,10 @@ fabianlee/docker-flask-oidc-client-app:1.0.0
 
 ## Notes
 
-* Had to lock pip module itsdangerous=2.0.1
+Had to lock pip module itsdangerous=2.0.1
 https://github.com/puiterwijk/flask-oidc/issues/147
 ImportError: cannot import name 'JSONWebSignatureSerializer' from 'itsdangerous'
 
-* Manual addition to local CA trust store
+Manual addition to local CA trust store
 cat myCA.pem >> lib/python3.8/site-packages/certifi/cacert.pem
 
