@@ -1,8 +1,8 @@
-# flask-oidc-python-tests/client-app
+# flask-oidc-python-tests/resource-server
 
-Python Flask web app that serves as the "Client Application" entity in an OAuth2 Authorization Code flow.
+Python Flask web app that serves as the "Resource Server" entity in an OAuth2 Authorization Code flow.
 
-It orchestrates authentication with the ADFS server, and receives a callback which provides the ID and Access Token that can then be used for authentication to a microservice.
+It exposes a protected microservice at ":8081/api" that accepts an OAuth2 Access Token for authorization.
 
 blog: 
 
@@ -24,11 +24,6 @@ pip install -r requirements.txt
 # your ADFS server
 export ADFS=win2k19-adfs1.fabian.lee
 
-# OAuth2 client, secret, scope
-export ADFS_CLIENT_ID=<the oauth2 client id>
-export ADFS_CLIENT_SECRET=<the oauth2 client secret>
-export ADFS_SCOPE="openid allatclaims api_delete"
-
 # add custom CA from ADFS server to CA filestore
 # you must provide the 'myCA.pem' file
 export ADFS_CA_PEM=$(cat myCA.pem | sed 's/\n/ /')
@@ -40,7 +35,7 @@ python src/app.py
 
 ## Run using local Docker daemon
 
-Image is based on python:3.9-slim-buster and is ~191Mb
+Image is based on python:3.9-slim-buster and is ~152Mb
 
 ```
 docker --version
@@ -58,19 +53,19 @@ export ADFS_SCOPE="openid allatclaims api_delete"
 export ADFS_CA_PEM=$(cat myCA.pem | sed 's/\n/ /')
 
 # clear out any older runs
-docker rm docker-flask-oidc-client-app
+docker rm docker-flask-oidc-resource-server
 
 # run docker image locally, listening on localhost:8080
 docker run \
 --network host \
 -p 8080:8080 \
---name docker-flask-oidc-client-app \
+--name docker-flask-oidc-resource-server \
 -e ADFS_CLIENT_ID=$ADFS_CLIENT_ID \
 -e ADFS_CLIENT_SECRET=$ADFS_CLIENT_SECRET \
 -e ADFS=$ADFS \
 -e ADFS_SCOPE="$ADFS_SCOPE" \
 -e ADFS_CA_PEM="$ADFS_CA_PEM" \
-fabianlee/docker-flask-oidc-client-app:1.0.0
+fabianlee/docker-flask-oidc-resource-server:1.0.0
 ```
 
 
