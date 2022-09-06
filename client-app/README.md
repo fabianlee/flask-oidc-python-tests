@@ -10,6 +10,10 @@ blog:
 # need 3.x
 python --version
 
+# make sure Python3 and other essential OS packages are installed
+sudo apt-get update
+sudo apt-get install software-properties-common python3 python3-dev python3-pip python3-venv make curl git -y
+
 # setup virtual env for pip modules
 python -m venv .
 source bin/activate
