@@ -9,3 +9,4 @@ lib/
 bin/
 include/
 pyvenv.cfg
+source*.sh
