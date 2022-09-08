@@ -9,7 +9,7 @@ It exposes a protected microservice at port 8081 that accepts an OAuth2 Access T
 
 ## Env vars required for Keycloak
 
-Configured per (my article on Keycloak setup)[]
+Configured per [my article on Keycloak setup]()
 
 ```
 export AUTH_SERVER=keycloak.kubeadm.local
@@ -21,7 +21,7 @@ export CA_PEM=$(cat kubeadmCA.pem | sed 's/\n/ /')
 
 ## Env vars required for ADFS
 
-Configured per (my article on ADFS setup)[https://fabianlee.org/2022/08/08/kvm-creating-a-windows2019-adfs-server-using-powershell/].
+Configured per [my article on ADFS setup](https://fabianlee.org/2022/08/08/kvm-creating-a-windows2019-adfs-server-using-powershell/).
 
 ```
 export AUTH_SERVER=win2k19-adfs1.fabian.lee
