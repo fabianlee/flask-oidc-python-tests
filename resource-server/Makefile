@@ -4,7 +4,7 @@ PROJECT := docker-flask-oidc-resource-server
 VERSION := 1.0.0
 OPV := $(OWNER)/$(PROJECT):$(VERSION)
 WEBPORT := 8081:8081
-ENV_VARS := -e AUTH_PROVIDER="$(AUTH_PROVIDER)" -e AUTH_SERVER="$(AUTH_SERVER)" -e CA_PEM="$(CA_PEM)"
+ENV_VARS := -e AUTH_PROVIDER="$(AUTH_PROVIDER)" -e AUTH_SERVER="$(AUTH_SERVER)" -e CA_PEM="$(shell echo $$CA_PEM)"
 
 # you may need to change to "sudo docker" if not a member of 'docker' group
 DOCKERCMD := "docker"
@@ -37,7 +37,7 @@ venv:
 
 ## runs container in foreground, testing a couple of override values
 docker-test-fg: init
-	$(DOCKERCMD) run -it -p $(WEBPORT) $(ENV_VARS) --rm $(OPV)
+	$(DOCKERCMD) run -it --network host -p $(WEBPORT) $(ENV_VARS) --rm $(OPV)
 
 ## runs container in foreground, override entrypoint to use use shell
 docker-test-cli:
@@ -45,7 +45,7 @@ docker-test-cli:
 
 ## run container in background
 docker-run-bg:
-	$(DOCKERCMD) run -d -p $(WEBPORT) $(ENV_VARS) --rm --name $(PROJECT) $(OPV)
+	$(DOCKERCMD) run --network host -d -p $(WEBPORT) $(ENV_VARS) --rm --name $(PROJECT) $(OPV)
 
 ## get into console of container running in background
 docker-cli-bg:

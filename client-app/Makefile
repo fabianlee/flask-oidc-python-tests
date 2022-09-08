@@ -4,7 +4,7 @@ PROJECT := docker-flask-oidc-client-app
 VERSION := 1.0.0
 OPV := $(OWNER)/$(PROJECT):$(VERSION)
 WEBPORT := 8080:8080
-ENV_VARS := -e AUTH_PROVIDER="$(AUTH_PROVIDER)" -e AUTH_SERVER="$(AUTH_SERVER)" -e REALM="$(REALM)" -e CLIENT_ID="$(CLIENT_ID)" -e CLIENT_SECRET="$(CLIENT_SECRET)" -e SCOPE="$(SCOPE)" -e CALLBACK_ROUTE="$(CALLBACK_ROUTE)" -e CA_PEM="$(CA_PEM)"
+ENV_VARS := -e AUTH_PROVIDER="$(AUTH_PROVIDER)" -e AUTH_SERVER="$(AUTH_SERVER)" -e REALM="$(REALM)" -e CLIENT_ID="$(CLIENT_ID)" -e CLIENT_SECRET="$(CLIENT_SECRET)" -e SCOPE="$(SCOPE)" -e CALLBACK_ROUTE="$(CALLBACK_ROUTE)" -e CA_PEM="$(shell echo $$CA_PEM)"
 
 # NOT using volume mount of file anymore, always passing in as env var 'CA_PEM' now
 # DOCKER_VOL_MOUNT := -v $(PWD)/myCA.pem:/home/app_user/app/myCA.pem

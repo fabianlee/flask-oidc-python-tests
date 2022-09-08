@@ -8,6 +8,8 @@ FROM python:3.9-slim-buster as builder
 RUN mkdir /app
 # copies everything from src/ into /app directory
 ADD src/ /app/
+# copies our personal fork of 'flask-oidc' module
+ADD flask-oidc/ /app/
 WORKDIR /app
 
 # requirements put into /app
@@ -40,22 +42,32 @@ CMD [ "python", "app.py" ]
 #
 FROM python:3.9-slim-buster
 
+# specific user instead of root
+RUN \
+  useradd --create-home --shell /bin/bash app_user
+
 # Extra python env
 ENV PYTHONDONTWRITEBYTECODE=1
 ENV PYTHONUNBUFFERED=1
 ENV PIP_DISABLE_PIP_VERSION_CHECK=1
 # path to python virtual env
-ENV PATH "/venv/bin:$PATH"
+ENV PATH "/home/app_user/venv/bin:$PATH"
 
 # copy in Python environment and app code
-COPY --from=builder /venv /venv
-COPY --from=builder /app /app
+COPY --from=builder /venv /home/app_user/venv
+COPY --from=builder /app /home/app_user/app
 
-WORKDIR /app
+RUN \
+  chown -R app_user /home/app_user && \
+  chmod ugo+r+w /home/app_user/venv/lib/python3.9/site-packages/certifi/cacert.pem
+USER app_user
+
+WORKDIR /home/app_user/app
 
 EXPOSE 8081
 
 # use python from virtualenv
-CMD [ "python", "app.py" ]
+#CMD [ "python", "app.py" ]
+CMD [ "bash", "run.sh" ]
 
 
