@@ -1,26 +1,10 @@
 OWNER := fabianlee
 PROJECT := docker-flask-oidc-resource-server
+#SHELL := /bin/bash
 VERSION := 1.0.0
 OPV := $(OWNER)/$(PROJECT):$(VERSION)
 WEBPORT := 8081:8081
-ENV_VARS := -e ADFS=$(ADFS) -e ADFS_CLIENT_ID=$(ADFS_CLIENT_ID) -e ADFS_CLIENT_SECRET=$(ADFS_CLIENT_SECRET) -e ADFS_SCOPE="$(ADFS_SCOPE)"
-
-ifeq ($(origin ADFS_CA_PEM_FILE),undefined)
-  ENV_VAR_EXISTS = 0; \
-  echo "WARNING env var 'ADFS_CA_PEM_FILE' does not exist."
-else
-  ENV_VAR_EXISTS = 1
-endif
-
-ifneq ("$(wildcard $(ADFS_CA_PEM_FILE))","")
-  FILE_EXISTS = 1
-else
-  FILE_EXISTS = 0; \
-  echo "WARNING 'ADFS_CA_PEM_FILE' file does not exist."
-endif
-ifeq ($(FILE_EXISTS),1)
-  ENV_VARS += -e ADFS_CA_PEM="$(shell cat $$ADFS_CA_PEM_FILE | sed 's/\n/ /' )"
-endif
+ENV_VARS := -e AUTH_PROVIDER="$(AUTH_PROVIDER)" -e AUTH_SERVER="$(AUTH_SERVER)" -e CA_PEM="$(CA_PEM)"
 
 # you may need to change to "sudo docker" if not a member of 'docker' group
 DOCKERCMD := "docker"
@@ -34,10 +18,9 @@ run-flask: init
 	python src/app.py
 
 init:
-	#[ -d flask-oidc ] || git clone https://github.com/fabianlee/flask-oidc.git
-	[ -d flask-oidc ] || git clone git@github.com:fabianlee/flask-oidc.git
-	echo File exists ? $(FILE_EXISTS)
-	echo env vars exists ? $(ENV_VAR_EXISTS)
+	#[ -d flask-oidc ] || git clone https://github.com/fabianlee/flask-oidc.git;
+	[ -d flask-oidc ] || git clone git@github.com:fabianlee/flask-oidc.git;
+	#[ -d flask-oidc ] && { cd flask-oidc;git pull -r; }
 	@echo MY_GITREF is $(MY_GITREF)
 
 ## builds docker image

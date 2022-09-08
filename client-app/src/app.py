@@ -12,7 +12,8 @@ import sys
 import certifi
 import httplib2
 import datetime
-from flask import Flask, request, jsonify, g, render_template
+from werkzeug.urls import url_encode
+from flask import Flask, request, jsonify, g, render_template, redirect
 
 sys.path += ['flask-oidc/']
 from flask_oidc import OpenIDConnect
@@ -23,66 +24,91 @@ log = logging.getLogger('werkzeug')
 log.setLevel(logging.ERROR)
 app = Flask(__name__)
 
-ADFS = os.getenv("ADFS","win2k19-adfs1.fabian.lee")
-print(f'ADFS: {ADFS}')
-
-# do a smoke test right up front that checks whether ADFS certs have been loaded
-# if not, no reason going forward
+# location of CA trust store file
 print(f'certifi = {certifi.where()}')
-http = httplib2.Http() #disable_ssl_certificate_validation=True)
-try:
-  content = http.request(f'https://{ADFS}/adfs/.well-known/openid-configuration')[1]
-  #print( content.decode() )
-  print("SUCCESS pulling /adfs/.well-known/openid-configuration, proves ADFS certificate is valid in CA filestore")
-except ssl.SSLCertVerificationError as e:
-  print("SSL verification error, ADFS cert and root not loaded into the root CA")
-  raise(e)
-  exit(3)
-except Exception as e:
-  print("ERROR could not reach ADFS well known configuration using httplib2")
-  raise(e)
-  exit(3)
 
-ADFS_CLIENT_ID = os.getenv("ADFS_CLIENT_ID","")
-print(f'ADFS_CLIENT_ID: {ADFS_CLIENT_ID}')
-ADFS_CLIENT_SECRET = os.getenv("ADFS_CLIENT_SECRET","")
-print(f'ADFS_CLIENT_SECRET: {ADFS_CLIENT_SECRET}')
+# Type of Authentication Server: generic|keycloak|adfs
+AUTH_PROVIDER = os.getenv("AUTH_PROVIDER","generic")
+print(f'AUTH_PROVIDER: {AUTH_PROVIDER}')
 
-ADFS_SCOPE = os.getenv("ADFS_SCOPE","openid allatclaims api_delete")
-print(f'ADFS_SCOPE: {ADFS_SCOPE}')
+# FQDN of OAuth2 Authentication Server
+AUTH_SERVER = os.getenv("AUTH_SERVER","")
+if len(AUTH_SERVER)<1:
+  raise Exception("AUTH_SERVER is required environment variable")
+print(f'AUTH_SERVER: {AUTH_SERVER}')
 
-ADFS_REDIRECT_URI = os.getenv("ADFS_REDIRECT_URI","http://localhost:8080/adfs/oauth2/token")
-print(f'ADFS_REDIRECT_URI: {ADFS_REDIRECT_URI}')
+CLIENT_ID = os.getenv("CLIENT_ID","")
+print(f'CLIENT_ID: {CLIENT_ID}')
+CLIENT_SECRET = os.getenv("CLIENT_SECRET","")
+print(f'CLIENT_SECRET: {CLIENT_SECRET}')
 
-# dictionary instead of requiring 'client_secrets.json' file
-# better for configuring docker containers
+SCOPE = os.getenv("SCOPE","openid") # keycloak: 'openid email profile' # ADFS 'openid allatclaims api_delete'
+print(f'SCOPE: {SCOPE}')
+
+CLIENT_BASE_APP_URL = os.getenv("CLIENT_BASE_APP_URL","http://localhost:8080")
+print(f'CLIENT_BASE_APP_URL: {CLIENT_BASE_APP_URL}')
+
+# Auth Server has permission to redirect here
+REDIRECT_URI = os.getenv("REDIRECT_URI","")
+if len(REDIRECT_URI)<1 and "keycloak"==AUTH_PROVIDER:
+  REDIRECT_URI = "*"
+elif len(REDIRECT_URI)<1 and "adfs"==AUTH_PROVIDER:
+  REDIRECT_URI = f'{CLIENT_BASE_APP_URL}/adfs/oauth2/token'
+else:
+  REDIRECT_URI = "*"
+
+# dictionary that will agument app config
 client_secrets_dict = {
   "web": {
-        "auth_uri": f'https://{ADFS}/adfs/oauth2/authorize/',
-        "client_id": f'{ADFS_CLIENT_ID}',
-        "client_secret": f'{ADFS_CLIENT_SECRET}',
-        "redirect_uri": f'{ADFS_REDIRECT_URI}',
-        "token_uri": f'https://{ADFS}/adfs/oauth2/token/'
+    "client_id": CLIENT_ID,
+    "client_secret": CLIENT_SECRET,
+    "redirect_uri": f'{REDIRECT_URI}'
   }
 }
-
+# app config settings
 app.config.update({
+    'OIDC_AUTH_PROVIDER': AUTH_PROVIDER,
+    'OIDC_AUTH_SERVER': AUTH_SERVER,
+    'OIDC_CLIENT_BASE_APP_URL': CLIENT_BASE_APP_URL,
+    'OIDC_CLIENT_SECRETS': client_secrets_dict,
+
     'SECRET_KEY': 'abc123!',
     'DEBUG': True,
-    'OIDC_CLIENT_SECRETS': client_secrets_dict,
     'OIDC_ID_TOKEN_COOKIE_SECURE': False,
     'OIDC_REQUIRE_VERIFIED_EMAIL': False,
-    'OIDC_ADFS' : f'{ADFS}',
-    'OIDC_VALID_ISSUERS': f'https://{ADFS}/adfs',
-    'OIDC_EXTRA_REQUEST_AUTH_PARAMS': { 'resource': f'{ADFS_CLIENT_ID}'},
-    'OIDC_CALLBACK_ROUTE': "/login/oauth2/code/adfs", # overrides default /oidc_callback
     'OIDC_USER_INFO_ENABLED': False,
-    'OIDC_SCOPES': ADFS_SCOPE.split(' '),
+    'OIDC_SCOPES': SCOPE.split(' ') if len(SCOPE)>0 else [],
     'OIDC_INTROSPECTION_AUTH_METHOD': 'client_secret_post',
     'OIDC_TOKEN_TYPE_HINT': 'code'
 })
 
-oidc = OpenIDConnect(app)
+# specific to Keycloak
+REALM = os.getenv("REALM","")
+if "keycloak"==AUTH_SERVER and len(REALM)<1:
+  raise Exception("Keycloak servers must have REALM set")
+if len(REALM)>0:
+  print(f'REALM: {REALM}')
+  app.config.update({
+    'OIDC_OPENID_REALM' : REALM
+  })
+
+# allows override for Client App to say where code will be posted back
+CALLBACK_ROUTE = os.getenv("CALLBACK_ROUTE","") # '/oidc_callback' is default for flask-oidc module
+if len(CALLBACK_ROUTE)>0:
+  print(f'CALLBACK_ROUTE: {CALLBACK_ROUTE}')
+  app.config.update({
+    'OIDC_CALLBACK_ROUTE': CALLBACK_ROUTE
+  })
+
+# ADFS requires non-standard 'resource' query parameter
+if "adfs"==AUTH_SERVER:
+  app.config.update({
+    'OIDC_EXTRA_REQUEST_AUTH_PARAMS': { 'resource': f'{CLIENT_ID}'}
+  })
+
+
+
+oidc = OpenIDConnect(app, prepopulate_from_well_known_url=True)
 
 @app.route('/')
 def index():
@@ -97,7 +123,7 @@ def protected_path():
        Uses the accompanied access_token to access a backend service.
     """
 
-    info = oidc.user_getinfo(['aud', 'upn','email', 'sub','nonce','given_name','group','role','scp','iss','iat','exp'])
+    info = oidc.user_getinfo(['aud', 'upn','email', 'sub','nonce','given_name','group','groups', 'role','scp','iss','iat','exp'])
     print(f'id_token: {g.oidc_id_token}')
     print('=== BEGIN ID TOKEN =====')
     for s in info.items():
@@ -105,7 +131,6 @@ def protected_path():
     print('=== END ID TOKEN =====')
 
     # pull claims from ID token
-    username = info.get('upn')
     email = info.get('email')
     user_id = info.get('sub')
     issued_at = datetime.datetime.fromtimestamp(info.get("iat"))
@@ -124,8 +149,25 @@ def logout():
     """Performs local logout by removing the session cookie."""
 
     oidc.logout()
-    return render_template('logout.html')
-    #return 'Hi, you have been logged out! <a href="/">Back to Home</a>'
+
+    if "keycloak"==AUTH_PROVIDER:
+      params = url_encode({ "post_logout_redirect_uri": f'{CLIENT_BASE_APP_URL}/', "client_id": CLIENT_ID })
+      base_logout = oidc.get_client_secrets()['end_session_endpoint']
+      logout_url = f'{base_logout}?{params}'
+      print(f'sending to Keycloak logout: {logout_url}')
+      return redirect(logout_url)
+    elif "adfs"==AUTH_PROVIDER:
+      id_token = request.cookies.get('oidc_id_token')
+      print(f'id_token {id_token}')
+      # this known issue might be the cause of not being able to specify 'id_token_hint'
+      # https://support.microsoft.com/en-us/topic/september-21-2021-kb5005625-os-build-17763-2210-preview-5ae2f63d-a9ce-49dd-a5e6-e05b90dc1cd8
+      params = url_encode({ "post_logout_redirect_uri": f'{CLIENT_BASE_APP_URL}/' }) #, "id_token_hint": id_token })
+      base_logout = oidc.get_client_secrets()['end_session_endpoint']
+      logout_url = f'{base_logout}?{params}'
+      print(f'sending to ADFS logout: {logout_url}')
+      return redirect(logout_url)
+    else:
+      return render_template('logout.html')
 
 
 

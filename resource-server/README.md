@@ -2,9 +2,35 @@
 
 Python Flask web app that serves as the "Resource Server" entity in an OAuth2 Authorization Code flow.
 
-It exposes a protected microservice at ":8081/api" that accepts an OAuth2 Access Token for authorization.
+It exposes a protected microservice at port 8081 that accepts an OAuth2 Access Token for authorization.
 
-blog: 
+* GET /api - test of authenticated user
+* GET /api/managers - authenticated user who is member of 'managers' group
+
+## Env vars required for Keycloak
+
+Configured per (my article on Keycloak setup)[]
+
+```
+export AUTH_SERVER=keycloak.kubeadm.local
+export AUTH_PROVIDER=keycloak
+
+# add custom CA from Keycloak, otherwise CERTIFICATE_VERIFY_FAILED errors
+export CA_PEM=$(cat kubeadmCA.pem | sed 's/\n/ /')
+```
+
+## Env vars required for ADFS
+
+Configured per (my article on ADFS setup)[https://fabianlee.org/2022/08/08/kvm-creating-a-windows2019-adfs-server-using-powershell/].
+
+```
+export AUTH_SERVER=win2k19-adfs1.fabian.lee
+export AUTH_PROVIDER=adfs
+
+# add custom CA from ADFS, otherwise CERTIFICATE_VERIFY_FAILED errors
+export CA_PEM=$(cat adfsCA.pem | sed 's/\n/ /')
+```
+
 
 ## Run using local Python
 
@@ -16,7 +42,7 @@ python --version
 sudo apt-get update
 sudo apt-get install software-properties-common python3 python3-dev python3-pip python3-venv make curl git -y
 
-# get ADFS enabled fork of flask-oidc
+# get my enhanced fork of flask-oidc
 git clone https://github.com/fabianlee/flask-oidc.git
 
 # setup virtual env for pip modules
@@ -24,31 +50,17 @@ python -m venv .
 source bin/activate
 pip install -r requirements.txt
 
-# your ADFS server
-export ADFS=win2k19-adfs1.fabian.lee
-
-# add custom CA from ADFS server to CA filestore
-# If custom ADFS CA, you must provide or you will get CERTIFICATE_VERIFY_FAILED
-export ADFS_CA_PEM=$(cat myCA.pem | sed 's/\n/ /')
+# add custom CA certificate from 'CA_PEM' to trust store file
 python src/add_ca.py3
 
-# start on port 8081, microservice at /api protected by OAuth2 Access Token
+# start Resource Server on port 8081, microservice at /api protected by OAuth2 Access Token
 python src/app.py
 ```
 
 ## Run using local Docker daemon
 
-Image is based on python:3.9-slim-buster and is ~152Mb
-
 ```
 docker --version
-
-# your ADFS server
-export ADFS=win2k19-adfs1.fabian.lee
-
-# add custom CA from ADFS server to CA filestore
-# If custom ADFS CA, you must provide or you will get CERTIFICATE_VERIFY_FAILED
-export ADFS_CA_PEM=$(cat myCA.pem | sed 's/\n/ /')
 
 # clear out any older runs
 docker rm docker-flask-oidc-resource-server
@@ -58,15 +70,17 @@ docker run \
 --network host \
 -p 8081:8081 \
 --name docker-flask-oidc-resource-server \
--e ADFS=$ADFS \
--e ADFS_CA_PEM="$ADFS_CA_PEM" \
+-e AUTH_SERVER=$AUTH_SERVER \
+-e AUTH_PROVIDER=$AUTH_PROVIDER \
+-e CA_PEM="$CA_PEM" \
 fabianlee/docker-flask-oidc-resource-server:1.0.0
 ```
 
 ## Testing JWT access token from command line
 
+Assumes you have already set environment variables, and run add_ca.py3 which adds custom CA to trust store.
+
 ```
-export ADFS=win2k19-adfs1.fabian.lee
 export JWT=<the access token>
 
 # runs tests against /api and /api/managers using bearer token
@@ -76,6 +90,8 @@ export JWT=<the access token>
 
 
 ## Notes
+
+Image is based on python:3.9-slim-buster and is ~152Mb
 
 Had to lock pip module itsdangerous=2.0.1
 https://github.com/puiterwijk/flask-oidc/issues/147

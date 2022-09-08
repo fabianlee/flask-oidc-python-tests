@@ -1,5 +1,6 @@
 *.pem
 *.crt
+*.pfx
 *.log
 flask-oidc/
 share/

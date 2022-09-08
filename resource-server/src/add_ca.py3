@@ -25,22 +25,22 @@ def add_to_ca_trust(cafile,myCA):
 cafile = certifi.where()
 print(f'certifi = {cafile}')
 
-ADFS_CA_PEM = os.getenv("ADFS_CA_PEM","")
-ADFS_CA_PEM_FILE = os.getenv("ADFS_CA_PEM_FILE","")
+CA_PEM = os.getenv("CA_PEM","")
+CA_PEM_FILE = os.getenv("CA_PEM_FILE","")
 
-if len(ADFS_CA_PEM)>0:
+if len(CA_PEM)>0:
 
-  print("ADFS_CA_PEM looks like environment variable")
+  print("CA_PEM looks like environment variable")
   # make sure to replace any spaces or carriage return back to EOL
-  if ADFS_CA_PEM.startswith('-----BEGIN CERTIFICATE-----') and ADFS_CA_PEM.endswith('-----END CERTIFICATE-----'):
-    content = ADFS_CA_PEM.split('-----BEGIN CERTIFICATE-----')[1] # get all after
+  if CA_PEM.startswith('-----BEGIN CERTIFICATE-----') and CA_PEM.endswith('-----END CERTIFICATE-----'):
+    content = CA_PEM.split('-----BEGIN CERTIFICATE-----')[1] # get all after
     content = content.split('-----END CERTIFICATE-----')[0] # get all before
     content = content.replace('\r','\n')
     content = content.replace(' ','\n')
-    ADFS_CA_PEM = '-----BEGIN CERTIFICATE-----' + content + '-----END CERTIFICATE-----\n'
+    CA_PEM = '-----BEGIN CERTIFICATE-----' + content + '-----END CERTIFICATE-----\n'
     print("done with substitution of CR and spaces to new lines")
-  print(f'custom CA:\n{ADFS_CA_PEM}')
-  add_to_ca_trust(cafile,ADFS_CA_PEM)
+  print(f'custom CA:\n{CA_PEM}')
+  add_to_ca_trust(cafile,CA_PEM)
 
 elif os.path.exists("myCA.pem"):
 
@@ -51,17 +51,17 @@ elif os.path.exists("myCA.pem"):
 
   add_to_ca_trust(cafile,myCA)
 
-elif os.path.exists(ADFS_CA_PEM_FILE):
+elif os.path.exists(CA_PEM_FILE):
 
-  print("ADFS_CA_PEM_FILE is pointed to file, going to read contents")
-  with open(ADFS_CA_PEM_FILE,'r') as mycafile:
+  print("CA_PEM_FILE is pointed to file, going to read contents")
+  with open(CA_PEM_FILE,'r') as mycafile:
     myCA = mycafile.read()
   print(f'custom CA:\n{myCA}')
 
   add_to_ca_trust(cafile,myCA)
 
 else:
-  print("SKIP cannot find valid ADFS env var or file")
+  print("SKIP cannot find valid env var or file")
 
 print()
 print("--------------------------------")
