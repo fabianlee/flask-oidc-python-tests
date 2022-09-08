@@ -2,7 +2,7 @@
 
 Python Flask web app that serves as the "Client Application" entity in an OAuth2 Authorization Code flow.
 
-It orchestrates authentication with the ADFS server, and receives a callback with token which is exchanged for ID and Access Token.
+It listens on port 8080 and orchestrates authentication with the ADFS server, recieving a callback with token which is exchanged for an ID and Access Token.
 
 ## Env vars required for Keycloak
 
@@ -32,7 +32,7 @@ export CLIENT_ID=<the oauth2 client id>
 export CLIENT_SECRET=<the oauth2 client secret>
 export SCOPE=openid allatclaims
 
-# matches 'Redirect URI' from ADFS server app
+# matches 'Redirect URI' from ADFS server app config
 export CALLBACK_ROUTE=/login/oauth2/code/adfs
 
 # add custom CA from ADFS, otherwise CERTIFICATE_VERIFY_FAILED errors
