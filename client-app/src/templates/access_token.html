@@ -81,6 +81,22 @@ function callREST(method,uri,populateElementId) {
   	
     <b>ID Token:</b><br/>
   	<table>
+		<tr>
+			<td>upn</td>
+			<td>{{ id_token['upn'] }}</td>
+		</tr>
+		<tr>
+			<td>email</td>
+			<td>{{ id_token['email'] }}</td>
+		</tr>
+		<tr>
+			<td>aud</td>
+			<td>{{ id_token['aud'] }}</td>
+		</tr>
+		<tr>
+			<td>iss</td>
+			<td>{{ id_token['iss'] }}</td>
+		</tr>
   	<tr>
   		<td>Scopes</td>
   		<td>{{ scope }}</td>

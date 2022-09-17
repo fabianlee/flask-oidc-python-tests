@@ -123,7 +123,7 @@ def protected_path():
        Uses the accompanied access_token to access a backend service.
     """
 
-    info = oidc.user_getinfo(['aud', 'upn','email', 'sub','nonce','given_name','group','groups', 'role','scp','iss','iat','exp'])
+    info = oidc.user_getinfo(['aud', 'upn','email', 'sub','nonce','given_name','group','groups', 'role','scp','scope','iss','iat','exp'])
     print(f'id_token: {g.oidc_id_token}')
     print('=== BEGIN ID TOKEN =====')
     for s in info.items():
@@ -131,7 +131,7 @@ def protected_path():
     print('=== END ID TOKEN =====')
 
     # pull claims from ID token
-    scope = find_the_attribute(g,"",["scp","scope"])
+    scope = find_the_attribute(info,"",["scp","scope"])
     issued_at = datetime.datetime.fromtimestamp(info.get("iat"))
     expires_at = datetime.datetime.fromtimestamp(info.get("exp"))
 
@@ -171,11 +171,11 @@ def logout():
 
 # since claims can be different between auth providers (scp versus scope) (group versus groups)
 # have function find the preferred one that exists
-def find_the_attribute(g,defaultValue,searchList):
+def find_the_attribute(info,defaultValue,searchList):
     for item in searchList:
       try:
-        if g.oidc_token_info.get(item):
-          return g.oidc_token_info[item]
+        if info.get(item):
+          return info[item]
       except:
         pass
     return defaultValue
