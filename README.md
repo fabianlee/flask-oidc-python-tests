@@ -5,6 +5,8 @@ Python Flask implementation of OAuth2 Client App and Resource Server entities us
 * [Client Application, web app running on port 8080](client-app/README.md)
 * [Resource Server, microservice running on port 8081](resource-server/README.md)
 
+![OAuth2 entities and flow](https://raw.githubusercontent.com/fabianlee/oauth2-client-app-golang/main/diagrams/oauth2-oidc-entities.drawio.png)
+
 ### Tested on OAuth2+OIDC Authentication Servers
 
 * [Windows 2019 ADFS](https://fabianlee.org/2022/08/22/microsoft-configuring-an-application-group-for-oauth2-oidc-on-adfs-2019/)

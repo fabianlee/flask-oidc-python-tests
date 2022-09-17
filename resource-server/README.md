@@ -7,6 +7,8 @@ It exposes a protected microservice at port 8081 that accepts an OAuth2 Access T
 * GET /api - test of authenticated user
 * GET /api/managers - authenticated user who is member of 'managers' group
 
+![OAuth2 entities and flow](https://raw.githubusercontent.com/fabianlee/oauth2-client-app-golang/main/diagrams/oauth2-oidc-entities.drawio.png)
+
 ## Env vars required for Keycloak
 
 Configured per [my article on Keycloak setup]()
