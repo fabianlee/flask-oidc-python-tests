@@ -42,6 +42,16 @@ export AUTH_PROVIDER=google
 # no custom cert needed, it has a public CA
 ```
 
+## Env vars required for okta
+
+Configured per [my article on okta OAuth2 setup](https://fabianlee.org/2022/09/12/oauth2-configuring-okta-for-oauth2-oidc/).
+
+```
+export AUTH_SERVER=dev-xxxx.okta.com
+export AUTH_PROVIDER=okta
+
+# no custom cert needed, it has a public CA
+```
 
 
 ## Run using local Python

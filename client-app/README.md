@@ -57,6 +57,23 @@ export CALLBACK_ROUTE=/login/google/callback
 # no custom cert needed, it has a public CA
 ```
 
+## Env vars required for okta
+
+Configured per [my article on okta OAuth2 setup](https://fabianlee.org/2022/09/12/oauth2-configuring-okta-for-oauth2-oidc/).
+
+```
+export AUTH_SERVER=dev-xxxx.okta.com
+export AUTH_PROVIDER=okta
+export CLIENT_ID=<the oauth2 client id>
+export CLIENT_SECRET=<the oauth2 client secret>
+export SCOPE="openid"
+
+export CALLBACK_ROUTE=/authorization-code/callback
+
+# no custom cert needed, it has a public CA
+```
+
+
 
 ## Run using local Python
 
