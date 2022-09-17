@@ -31,6 +31,18 @@ export AUTH_PROVIDER=adfs
 export CA_PEM=$(cat adfsCA.pem | sed 's/\n/ /')
 ```
 
+## Env vars required for Google
+
+Configured per [my article on Google OAuth2 setup](https://fabianlee.org/2022/09/13/oauth2-configuring-google-for-oauth2-oidc/).
+
+```
+export AUTH_SERVER=accounts.google.com
+export AUTH_PROVIDER=google
+
+# no custom cert needed, it has a public CA
+```
+
+
 
 ## Run using local Python
 
