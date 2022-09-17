@@ -75,26 +75,8 @@ function callREST(method,uri,populateElementId) {
 </head>
 <body>
 
-    <h3>OAuth2 ID + Access Token</h3>
+    <h3>OAuth2 Access Token</h3>
 
-    <p><a href="/">Back to Main Page</a></p>
-  	
-    <b>ID Token:</b><br/>
-  	<table>
-  	<tr>
-  		<td>Scopes</td>
-  		<td>{{ scope }}</td>
-  	</tr>
-  	<tr>
-  		<td>Issued At</td>
-  		<td>{{ issued_at }}</td>
-  	</tr>
-  	<tr>
-  		<td>Expires At</td>
-  		<td>{{ expires_at }}</td>
-  	</tr>
-  	</table>
-  	
 <form id="dataform">
 <p><b>Access Token:</b><br/>
 <textarea id="token" rows="8" cols="110" style="font-size: small;">{{ access_token }}

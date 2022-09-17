@@ -11,7 +11,7 @@ import logging
 import ssl
 import sys
 import certifi
-from flask import Flask, request, jsonify, g
+from flask import Flask, request, jsonify, g, render_template
 from flask_cors import CORS
 
 sys.path += ['flask-oidc/']
@@ -72,6 +72,10 @@ if len(REALM)>0:
 
 oidc = OpenIDConnect(app, prepopulate_from_well_known_url=True)
 
+@app.route('/')
+def index():
+    return render_template('access_token.html', access_token="")
+
 @app.route('/api', methods=['GET','POST'])
 @oidc.accept_token(require_token=True, scopes_required=['openid'])
 def hello_api():
@@ -81,9 +85,10 @@ def hello_api():
     print(g.oidc_token_info)
     print("=== END ACCESS TOKEN =========================")
 
-    scope = get_the_scope(g)
+    user = find_the_attribute(g,"",["email","upn","sub"])
+    scope = find_the_attribute(g,"",["scp","scope"])
     data = {
-      "hello": f"Welcome {g.oidc_token_info['email']}",
+      "hello": f"Welcome {user}",
       "my_scopes": f'{scope}'
     }
     return data
@@ -97,36 +102,26 @@ def hello_manager():
     print(g.oidc_token_info)
     print("=== END ACCESS TOKEN =========================")
 
-    scope = get_the_scope(g)
-    group = get_the_group(g)
+    user = find_the_attribute(g,"",["email","upn","sub"])
+    scope = find_the_attribute(g,"",["scp","scope"])
+    group = find_the_attribute(g,"",["group","groups"])
     data = {
-      "hello": f"Welcome {g.oidc_token_info['email']}",
-      "my_scopes": f"s{scope}",
-      "my_groups": f"s{group}"
+      "hello": user,
+      "my_scopes": scope,
+      "my_groups": group
     }
     return data
 
-def get_the_scope(g):
-    # scope either in 'scp' or 'scope' depending on Auth Server
-    scope = ""
-    if g.oidc_token_info.get('scp'):
-      scope = g.oidc_token_info['scp']
-    elif g.oidc_token_info.get('scope'):
-      scope = g.oidc_token_info['scope']
-    else:
-      scope = ""
-    return scope
-
-def get_the_group(g):
-    # groups either in 'group' or 'groups' depending on Auth Server
-    group = ""
-    if g.oidc_token_info.get('group'):
-      group = g.oidc_token_info['group']
-    elif g.oidc_token_info.get('groups'):
-      group = g.oidc_token_info['groups']
-    else:
-      group = ""
-    return group
+# since claims can be different between auth providers (scp versus scope) (group versus groups)
+# have function find the preferred one that exists
+def find_the_attribute(g,defaultValue,searchList):
+    for item in searchList:
+      try:
+        if g.oidc_token_info.get(item):
+          return g.oidc_token_info[item]
+      except:
+        pass
+    return defaultValue
 
 
 if __name__ == '__main__' or __name__ == "main":

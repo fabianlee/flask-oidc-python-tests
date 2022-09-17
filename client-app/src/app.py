@@ -54,8 +54,9 @@ if len(REDIRECT_URI)<1 and "keycloak"==AUTH_PROVIDER:
   REDIRECT_URI = "*"
 elif len(REDIRECT_URI)<1 and "adfs"==AUTH_PROVIDER:
   REDIRECT_URI = f'{CLIENT_BASE_APP_URL}/adfs/oauth2/token'
-else:
+elif len(REDIRECT_URI)<1:
   REDIRECT_URI = "*"
+print(f'REDIRECT_URI: {REDIRECT_URI}')
 
 # dictionary that will agument app config
 client_secrets_dict = {
@@ -107,7 +108,6 @@ if "adfs"==AUTH_SERVER:
   })
 
 
-
 oidc = OpenIDConnect(app, prepopulate_from_well_known_url=True)
 
 @app.route('/')
@@ -131,8 +131,7 @@ def protected_path():
     print('=== END ID TOKEN =====')
 
     # pull claims from ID token
-    email = info.get('email')
-    user_id = info.get('sub')
+    scope = find_the_attribute(g,"",["scp","scope"])
     issued_at = datetime.datetime.fromtimestamp(info.get("iat"))
     expires_at = datetime.datetime.fromtimestamp(info.get("exp"))
 
@@ -142,7 +141,7 @@ def protected_path():
     print(access_token)
     print('=== END ACCESS TOKEN =====')
 
-    return render_template('access_token.html', id_token=info, issued_at=issued_at, expires_at=expires_at, access_token=access_token)
+    return render_template('access_token.html', id_token=info, issued_at=issued_at, expires_at=expires_at, scope=scope, access_token=access_token)
 
 @app.route('/logout')
 def logout():
@@ -170,6 +169,16 @@ def logout():
       return render_template('logout.html')
 
 
+# since claims can be different between auth providers (scp versus scope) (group versus groups)
+# have function find the preferred one that exists
+def find_the_attribute(g,defaultValue,searchList):
+    for item in searchList:
+      try:
+        if g.oidc_token_info.get(item):
+          return g.oidc_token_info[item]
+      except:
+        pass
+    return defaultValue
 
 if __name__ == '__main__' or __name__ == "main":
 
