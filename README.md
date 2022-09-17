@@ -10,7 +10,7 @@ Python Flask implementation of OAuth2 Client App and Resource Server entities us
 ### Tested on OAuth2+OIDC Authentication Servers
 
 * [Windows 2019 ADFS](https://fabianlee.org/2022/08/22/microsoft-configuring-an-application-group-for-oauth2-oidc-on-adfs-2019/)
-* [Keycloak 19.01 on Kubernetes](https://fabianlee.org/2022/09/06/python-flask-oidc-protecting-client-app-and-resource-server-using-windows-2019-adfs/)
+* [Keycloak 19.01 on Kubernetes](https://fabianlee.org/2022/09/10/kubernetes-keycloak-iam-deployed-into-kubernetes-cluster-for-oauth2-oidc/)
 * [Google OAuth2](https://fabianlee.org/2022/09/13/oauth2-configuring-google-for-oauth2-oidc/)
 * [okta](https://fabianlee.org/2022/09/12/oauth2-configuring-okta-for-oauth2-oidc/)
 
@@ -23,6 +23,5 @@ Python Flask implementation of OAuth2 Client App and Resource Server entities us
 ### My related blog articles
 
 * [Flask-OIDC with Windows 2019 ADFS Authentication Server](https://fabianlee.org/2022/09/06/python-flask-oidc-protecting-client-app-and-resource-server-using-windows-2019-adfs/)
-* [Flask-OIDC with Keycloak Authentication Server](https://fabianlee.org/2022/09/06/python-flask-oidc-protecting-client-app-and-resource-server-using-windows-2019-adfs/)
 
 
