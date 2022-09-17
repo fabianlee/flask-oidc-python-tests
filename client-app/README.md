@@ -2,7 +2,9 @@
 
 Python Flask web app that serves as the "Client Application" entity in an OAuth2 Authorization Code flow.
 
-It listens on port 8080 and orchestrates authentication with the Authentication Server, recieving a callback with token which is opaquely exchanged for an ID and Access Token.
+It listens on port 8080 and orchestrates authentication with the Authentication Server, recieving a callback with token which is exchanged for an ID and Access Token via back-channel.
+
+![OAuth2 entities and flow](https://raw.githubusercontent.com/fabianlee/oauth2-client-app-golang/main/diagrams/oauth2-oidc-entities.drawio.png)
 
 ## Env vars required for Keycloak
 
