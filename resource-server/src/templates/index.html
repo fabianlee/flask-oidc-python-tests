@@ -1,0 +1,25 @@
+<html>
+<head>
+</head>
+<body>
+
+    <h3>OAuth2 Resource Server</h3>
+
+    <p>{{ greeting }}</p>
+
+    <p>&nbsp;</p>
+    Click on one one of the links below to interactively invoke the REST endpoints:
+    <ul>
+        <li><a href="/access_token">with unauthenticated user, where user manually provide the Access Token</a></li>
+        <li><a href="/access_token_protected">with authenticated user, where Access Token is pulled from header</a></li>
+    </ul>
+
+    {% if access_token %}
+    <p>&nbsp;</p>
+    <textarea id="token" rows="8" cols="110" style="font-size: small;">{{ access_token }}
+    </textarea>
+    {% endif %}
+
+</body>
+</html>
+

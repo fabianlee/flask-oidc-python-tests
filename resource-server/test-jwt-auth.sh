@@ -17,6 +17,12 @@ ua="Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101 Firefox/81.0"
 auth_header="Authorization: Bearer ${JWT}"
 
 echo ""
+echo "===== GET to /access_token should return html page  ====="
+set -x
+curl -X GET -k -A "$ua" "$resource_server/access_token" -H "$auth_header"
+exit 0
+
+echo ""
 echo "===== GET to /api should return api results  ====="
 curl -X GET -k -A "$ua" "$resource_server/api" -H "$auth_header"
 

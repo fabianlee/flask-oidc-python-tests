@@ -74,7 +74,25 @@ oidc = OpenIDConnect(app, prepopulate_from_well_known_url=True)
 
 @app.route('/')
 def index():
-    return render_template('access_token.html', access_token="")
+    auth_header = find_the_attribute(request.headers, "", ['Authorization','authorization'])
+    if len(auth_header)>0:
+      greeting = f'Hello authenticated user! I see an "Authorization" request header'
+    else:
+      greeting = f'Hello anonymous user. There is no "Authorization" request header'
+    return render_template('index.html', greeting=greeting,access_token=auth_header)
+
+@app.route('/access_token')
+@oidc.accept_token(require_token=False)
+def access_token_notrequired():
+    auth_header = find_the_attribute(request.headers, "",['Authorization','authorization'])
+    return render_template('access_token.html', access_token=auth_header)
+
+@app.route('/access_token_protected')
+@oidc.accept_token(require_token=True)
+def access_token_required():
+    auth_header = find_the_attribute(request.headers, "",['Authorization','authorization'])
+    return render_template('access_token.html', access_token=auth_header)
+
 
 @app.route('/api', methods=['GET','POST'])
 @oidc.accept_token(require_token=True, scopes_required=['openid'])
