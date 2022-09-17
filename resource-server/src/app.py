@@ -85,8 +85,8 @@ def hello_api():
     print(g.oidc_token_info)
     print("=== END ACCESS TOKEN =========================")
 
-    user = find_the_attribute(g,"",["email","upn","sub"])
-    scope = find_the_attribute(g,"",["scp","scope"])
+    user = find_the_attribute(g.oidc_token_info,"",["email","upn","sub"])
+    scope = find_the_attribute(g.oidc_token_info,"",["scp","scope"])
     data = {
       "hello": f"Welcome {user}",
       "my_scopes": f'{scope}'
@@ -102,9 +102,9 @@ def hello_manager():
     print(g.oidc_token_info)
     print("=== END ACCESS TOKEN =========================")
 
-    user = find_the_attribute(g,"",["email","upn","sub"])
-    scope = find_the_attribute(g,"",["scp","scope"])
-    group = find_the_attribute(g,"",["group","groups"])
+    user = find_the_attribute(g.oidc_token_info,"",["email","upn","sub"])
+    scope = find_the_attribute(g.oidc_token_info,"",["scp","scope"])
+    group = find_the_attribute(g.oidc_token_info,"",["group","groups"])
     data = {
       "hello": user,
       "my_scopes": scope,
@@ -114,11 +114,11 @@ def hello_manager():
 
 # since claims can be different between auth providers (scp versus scope) (group versus groups)
 # have function find the preferred one that exists
-def find_the_attribute(g,defaultValue,searchList):
+def find_the_attribute(info,defaultValue,searchList):
     for item in searchList:
       try:
-        if g.oidc_token_info.get(item):
-          return g.oidc_token_info[item]
+        if info.get(item):
+          return info[item]
       except:
         pass
     return defaultValue
