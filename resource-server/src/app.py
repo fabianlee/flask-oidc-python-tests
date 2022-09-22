@@ -75,6 +75,8 @@ oidc = OpenIDConnect(app, prepopulate_from_well_known_url=True)
 
 @app.route('/')
 def index():
+    """Main entry point, does not require any authentication
+    """
 
     print('=== BEGIN REQ HEADERS =======================')
     for key in request.headers:
@@ -92,20 +94,27 @@ def index():
 @app.route('/access_token')
 @oidc.accept_token(require_token=False)
 def access_token_notrequired():
+    """Test invocation page, does not require any authentication
+    """
+
     auth_header = get_auth_header(request.headers)
     return render_template('access_token.html', access_token=auth_header)
 
 @app.route('/access_token_protected')
 @oidc.accept_token(require_token=True)
 def access_token_required():
+    """Test invocation page, requires authentication
+    """
+
     auth_header = get_auth_header(request.headers)
     return render_template('access_token.html', access_token=auth_header)
 
 
 @app.route('/api', methods=['GET','POST'])
-@oidc.accept_token(require_token=True, scopes_required=['openid'])
+@oidc.accept_token(require_token=True)
 def hello_api():
-    """OAuth 2.0 protected API endpoint accessible via AccessToken"""
+    """OAuth 2.0 protected API endpoint accessible via AccessToken
+    """
 
     print("=== BEGIN ACCESS TOKEN =======================")
     print(g.oidc_token_info)
@@ -119,10 +128,34 @@ def hello_api():
     }
     return data
 
+@app.route('/api/users', methods=['GET','POST'])
+@oidc.accept_token(require_token=True, scopes_required=['openid'])
+def hello_users():
+    """OAuth 2.0 protected API endpoint accessible via AccessToken
+    requiring scope
+    """
+
+    print("=== BEGIN ACCESS TOKEN =======================")
+    print(g.oidc_token_info)
+    print("=== END ACCESS TOKEN =========================")
+
+    user = find_the_attribute(g.oidc_token_info,"",["email","upn","sub"])
+    scope = find_the_attribute(g.oidc_token_info,"",["scp","scope"])
+    data = {
+      "me": f"{user} with scope {scope}",
+      "user1": 'moe',
+      "user2": 'larry',
+      "user3": 'curly',      
+    }
+    return data
+
+
 @app.route('/api/managers', methods=['GET','POST'])
 @oidc.accept_token(require_token=True, scopes_required=['openid'], groups_required=['managers'])
 def hello_manager():
-    """OAuth 2.0 protected API endpoint accessible via AccessToken"""
+    """OAuth 2.0 protected API endpoint accessible via AccessToken
+    requiring scope and group claim
+    """
 
     print("=== BEGIN ACCESS TOKEN =======================")
     print(g.oidc_token_info)

@@ -98,13 +98,20 @@ Returns: Test of authenticated call<br/>
 Authorization: any logged in user</p>
 <div id="GETapi" class="apiresults">Press 'Invoke' to populate</div>
 
+<p>&nbsp;</p>
+<span class="apiheader">GET /api/users</span>
+<input type="button" value="Invoke" onClick="callREST('GET','/api/users','GETapiusers')"/>
+<p class="methodinfo">
+Returns: List of users<br/>
+Authorization: must have 'openid' scope</p>
+<div id="GETapiusers" class="apiresults">Press 'Invoke' to populate</div>
 
 <p>&nbsp;</p>
 <span class="apiheader">GET /api/managers</span>
 <input type="button" value="Invoke" onClick="callREST('GET','/api/managers','GETapimanagers')"/>
 <p class="methodinfo">
 Returns: Test of authenticated call<br/>
-Authorization: must be in 'managers' group</p>
+Authorization: must have 'openid' scope and have 'managers' in group claim</p>
 <div id="GETapimanagers" class="apiresults">Press 'Invoke' to populate</div>
 
 
