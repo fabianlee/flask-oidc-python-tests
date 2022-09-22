@@ -26,6 +26,7 @@
 
 <script>
 
+
 function doRequest(method,URL,bearer,populateElementId) {
 
 	fetch(URL, {
@@ -84,6 +85,10 @@ function callREST(method,uri,populateElementId) {
 </p>
 <p>Resource Server: <input id="resource_server" type="text" value="http://localhost:8081"/></p>
 </form>
+
+<script>
+document.getElementById('resource_server').value = window.location.protocol + "//" + window.location.host;
+</script>
 
 <p>&nbsp;</p>
 <span class="apiheader">GET /api</span>

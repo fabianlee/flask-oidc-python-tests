@@ -16,6 +16,7 @@ Configured per [my article on Keycloak setup]()
 ```
 export AUTH_SERVER=keycloak.kubeadm.local
 export AUTH_PROVIDER=keycloak
+export REALM=<realmName>
 
 # add custom CA from Keycloak, otherwise CERTIFICATE_VERIFY_FAILED errors
 export CA_PEM=$(cat kubeadmCA.pem | sed 's/\n/ /')

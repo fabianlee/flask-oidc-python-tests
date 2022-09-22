@@ -72,11 +72,19 @@ if len(REALM)>0:
 
 oidc = OpenIDConnect(app, prepopulate_from_well_known_url=True)
 
+
 @app.route('/')
 def index():
-    auth_header = find_the_attribute(request.headers, "", ['Authorization','authorization'])
+
+    print('=== BEGIN REQ HEADERS =======================')
+    for key in request.headers:
+      print(f'request.key {key}')
+    print('=== END REQ HEADERS =======================')
+
+    auth_header = get_auth_header(request.headers)
     if len(auth_header)>0:
-      greeting = f'Hello authenticated user! I see an "Authorization" request header'
+      user_header = find_the_attribute(request.headers, "authenticated user", ['X-Auth-Request-Email'])
+      greeting = f'Hello {user_header}! I see an "Authorization" request header'
     else:
       greeting = f'Hello anonymous user. There is no "Authorization" request header'
     return render_template('index.html', greeting=greeting,access_token=auth_header)
@@ -84,13 +92,13 @@ def index():
 @app.route('/access_token')
 @oidc.accept_token(require_token=False)
 def access_token_notrequired():
-    auth_header = find_the_attribute(request.headers, "",['Authorization','authorization'])
+    auth_header = get_auth_header(request.headers)
     return render_template('access_token.html', access_token=auth_header)
 
 @app.route('/access_token_protected')
 @oidc.accept_token(require_token=True)
 def access_token_required():
-    auth_header = find_the_attribute(request.headers, "",['Authorization','authorization'])
+    auth_header = get_auth_header(request.headers)
     return render_template('access_token.html', access_token=auth_header)
 
 
@@ -140,6 +148,13 @@ def find_the_attribute(info,defaultValue,searchList):
       except:
         pass
     return defaultValue
+
+# finds Bearer token in request headers
+def get_auth_header(request_headers):
+    auth_header = find_the_attribute(request_headers, "", ['X-Auth-Request-Access-Token','Authorization'])
+    if auth_header.startswith("Bearer "):
+      auth_header = auth_header[len("Bearer "):]
+    return auth_header
 
 
 if __name__ == '__main__' or __name__ == "main":

@@ -7,15 +7,14 @@
 
     <p>{{ greeting }}</p>
 
-    <p>&nbsp;</p>
-    Click on one one of the links below to interactively invoke the REST endpoints:
     <ul>
-        <li><a href="/access_token">with unauthenticated user, where user manually provide the Access Token</a></li>
-        <li><a href="/access_token_protected">with authenticated user, where Access Token is pulled from header</a></li>
+        <li><a href="/access_token">interactive invoke REST endpoints (no authentication required)</a></li>
+        <li><a href="/access_token_protected">interactively invoke REST endpoints (authentication required)</a></li>
     </ul>
 
     {% if access_token %}
     <p>&nbsp;</p>
+    Access Token:<br/>
     <textarea id="token" rows="8" cols="110" style="font-size: small;">{{ access_token }}
     </textarea>
     {% endif %}

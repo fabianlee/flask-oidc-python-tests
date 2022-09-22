@@ -107,6 +107,8 @@ if "adfs"==AUTH_SERVER:
     'OIDC_EXTRA_REQUEST_AUTH_PARAMS': { 'resource': f'{CLIENT_ID}'}
   })
 
+# location of 3rd party API, use Access Token in Authorization header
+RESOURCE_SERVER = os.getenv("RESOURCE_SERVER","http://localhost:8081")
 
 oidc = OpenIDConnect(app, prepopulate_from_well_known_url=True)
 
@@ -114,7 +116,13 @@ oidc = OpenIDConnect(app, prepopulate_from_well_known_url=True)
 def index():
     """Page that shows either authenticated user name OR login link
     """
-    return render_template('index.html', user_loggedin=oidc.user_loggedin, oidc=oidc)
+
+    print('=== BEGIN REQ HEADERS =======================')
+    for key in request.headers:
+      print(f'request.key {key}')
+    print('=== END REQ HEADERS =======================')
+
+    return render_template('index.html', user_loggedin=oidc.user_loggedin, oidc=oidc, access_token="")
 
 @app.route('/protected')
 @oidc.require_login
@@ -141,7 +149,7 @@ def protected_path():
     print(access_token)
     print('=== END ACCESS TOKEN =====')
 
-    return render_template('access_token.html', id_token=info, issued_at=issued_at, expires_at=expires_at, scope=scope, access_token=access_token)
+    return render_template('access_token.html', id_token=info, issued_at=issued_at, expires_at=expires_at, scope=scope, access_token=access_token,resource_server_hostport=RESOURCE_SERVER)
 
 @app.route('/logout')
 def logout():
