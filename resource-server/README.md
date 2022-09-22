@@ -56,6 +56,16 @@ export AUTH_PROVIDER=okta
 # no custom cert needed, it has a public CA
 ```
 
+## Env vars required for Github non-OIDC OAuth2
+
+Configured per [my article on Github OAuth2 setup](https://fabianlee.org/2022/09/12/oauth2-configuring-github-for-oauth2/).
+
+```
+export AUTH_SERVER=github.com
+export AUTH_PROVIDER=github
+
+# no custom cert needed, it has a public CA
+```
 
 ## Run using local Python
 
