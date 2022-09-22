@@ -58,7 +58,7 @@ export AUTH_PROVIDER=okta
 
 ## Env vars required for Github non-OIDC OAuth2
 
-Configured per [my article on Github OAuth2 setup](https://fabianlee.org/2022/09/12/oauth2-configuring-github-for-oauth2/).
+Configured per [my article on Github OAuth2 setup](https://fabianlee.org/2022/09/12/oauth2-configuring-github-for-oauth2/).  Github as a non-OIDC Auth provider is supported only on this resource server side.
 
 ```
 export AUTH_SERVER=github.com
@@ -66,6 +66,18 @@ export AUTH_PROVIDER=github
 
 # no custom cert needed, it has a public CA
 ```
+
+## Env vars required for Spotify non-OIDC OAuth2
+
+Configured per [my article on Spotify OAuth2 setup](https://fabianlee.org/2022/09/12/oauth2-configuring-spotify-for-oauth2/). Spotify as a non-OIDC Auth provider is supported only on this resource server side.
+
+```
+export AUTH_SERVER=accounts.spotify.com
+export AUTH_PROVIDER=spotify
+
+# no custom cert needed, it has a public CA
+```
+
 
 ## Run using local Python
 
